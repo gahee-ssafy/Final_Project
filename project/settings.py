@@ -139,4 +139,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ... (기존 코드들) ...
 
 # .env에서 가져온 키를 Django 설정 변수에 담기
-FINLIFE_API_KEY = env('FINLIFE_API_KEY')  # 👈 이 줄이 없어서 에러가 난 겁니다!
+FINLIFE_API_KEY = env('FINLIFE_API_KEY', default='')  # 👈 이 줄이 없어서 에러가 난 겁니다!
