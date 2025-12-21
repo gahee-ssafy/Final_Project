@@ -45,6 +45,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'products',
+    'accounts',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -52,7 +53,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 회원가입 기능
     'rest_framework',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration', 
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount'
+
 ]
 
 MIDDLEWARE = [
@@ -64,6 +73,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -148,3 +158,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5173",
 ]
+
+# [수정] 백폴더 이식
+# "이제 기본 유저 대신 내가 만든 accounts 앱의 User 모델을 쓸 거야" 라는 뜻
+AUTH_USER_MODEL = 'accounts.User'
