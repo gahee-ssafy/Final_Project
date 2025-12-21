@@ -9,8 +9,7 @@ import GoldView from '@/views/GoldView.vue'
 import LogInView from '@/views/LogInView.vue'
 import SignUpView from '@/views/SignUpView.vue'
 
-// (지도는 아직 안 만들었으니 임시로 HomeView나 ComingSoonView를 씁니다)
-// import MapView from '@/views/MapView.vue'
+import MapView from '@/views/MapView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -48,11 +47,11 @@ const router = createRouter({
       component: GoldView,
     },
 
-    // 4. 지도 페이지 (아직 안 만들었으므로 임시로 HomeView 연결)
+    // 4. 지도 페이지
     {
       path: '/map',
       name: 'MapView',
-      component: HomeView, // 나중에 MapView 만들면 교체하세요!
+      component: MapView
     },
   ],
 })
