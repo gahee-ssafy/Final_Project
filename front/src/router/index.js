@@ -16,6 +16,12 @@ import YoutubeSearchView from '@/views/youtube/YoutubeSearchView.vue'
 import YoutubeVideoDetailView from '@/views/youtube/YoutubeVideoDetailView.vue'
 import YoutubeSavedView from '@/views/youtube/YoutubeSavedView.vue'
 
+// F07 커뮤니티
+import CommunityListView from '@/views/community/CommunityListView.vue'
+import CommunityDetailView from '@/views/community/CommunityDetailView.vue'
+import CommunityCreateView from '@/views/community/CommunityCreateView.vue'
+import CommunityEditView from '@/views/community/CommunityEditView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -74,6 +80,27 @@ const router = createRouter({
       path: '/youtube/video/:id',
       name: 'YoutubeVideoDetailView',
       component: YoutubeVideoDetailView,
+    },
+    // 7. 커뮤니티
+    {
+      path: '/community',
+      name: 'CommunityListView',
+      component: CommunityListView,
+    },
+    {
+      path: '/community/create',
+      name: 'CommunityCreateView',
+      component: CommunityCreateView,
+    },
+    {
+      path: '/community/:id',
+      name: 'CommunityDetailView',
+      component: CommunityDetailView,
+    },
+    {
+      path: '/community/:id/edit',
+      name: 'CommunityEditView',
+      component: CommunityEditView,
     },
 
   ],
