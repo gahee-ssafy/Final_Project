@@ -51,4 +51,35 @@ class SpotPrice(models.Model):
 
     def __str__(self):
         return f"{self.item_name} - {self.base_date}"
+
+# F08
+class SavingProducts(models.Model):
+    # 금융 상품 코드 (유니크 키로 잡아두면 중복 저장을 방지할 수 있습니다)
+    fin_prdt_cd = models.TextField(unique=True)
     
+    # 금융 회사명 (예: 우리은행, 신한은행)
+    kor_co_nm = models.TextField()
+    
+    # 금융 상품명 (예: WON 적금)
+    fin_prdt_nm = models.TextField()
+    
+    # 가입 방법 (예: 인터넷, 스마트폰)
+    join_way = models.TextField()
+    
+    # 만기 후 이자율 등 기타 유의사항
+    etc_note = models.TextField()
+    
+    # 가입 제한 (1:제한없음, 2:서민전용, 3:일부제한) - API 명세에 따라 다름
+    join_deny = models.IntegerField(null=True, blank=True)
+    
+    # 가입 대상 (예: 실명의 개인)
+    join_member = models.TextField()
+    
+    # 우대 조건 (긴 텍스트가 들어갈 수 있음)
+    spcl_cnd = models.TextField()
+    
+    # 공시 제출월 (혹은 권한 범위 등 관리용 필드)
+    dcls_month = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.kor_co_nm} - {self.fin_prdt_nm}'

@@ -70,3 +70,34 @@ def get_recommendations(user_input_text):
     # 4. 유사도 순으로 정렬하여 상위 3개 반환
     recommendations.sort(key=lambda x: x['similarity'], reverse=True)
     return recommendations[:3]
+
+# F08 가입하기 버튼
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated]) # 로그인한 사람만 가능
+def join_deposit(request, fin_prdt_cd):
+    # 1. 가입하려는 상품을 찾습니다.
+    product = get_object_or_404(DepositProducts, fin_prdt_cd=fin_prdt_cd)
+    user = request.user
+
+    # 2. 이미 가입되어 있는지 확인합니다.
+    # user.joined_deposits.filter(...) 방식도 가능하지만, 역참조를 쓰면 더 직관적일 때가 있습니다.
+    if user.joined_deposits.filter(pk=product.pk).exists():
+        # 이미 가입했으면 -> 해지 (remove)
+        user.joined_deposits.remove(product)
+        is_joined = False
+        message = '상품 가입이 해지되었습니다.'
+    else:
+        # 가입 안 했으면 -> 추가 (add)
+        user.joined_deposits.add(product)
+        is_joined = True
+        message = '상품에 가입되었습니다.'
+
+    # 3. 변경된 상태를 프론트엔드에 알려줍니다.
+    return Response({
+        'is_joined': is_joined,
+        'message': message
+    })

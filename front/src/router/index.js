@@ -16,6 +16,9 @@ import YoutubeSearchView from '@/views/youtube/YoutubeSearchView.vue'
 import YoutubeVideoDetailView from '@/views/youtube/YoutubeVideoDetailView.vue'
 import YoutubeSavedView from '@/views/youtube/YoutubeSavedView.vue'
 
+// F08
+import ProfileView from '@/views/ProfileView.vue'
+import ArticleView from '@/views/ArticleView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -37,6 +40,12 @@ const router = createRouter({
       path: '/signup',
       name: 'SignUpView',
       component: SignUpView,
+    },
+    // [F08] 마이페이지 라우터
+    {
+      path: '/profile',
+      name: 'ProfileView',
+      component: ProfileView,
     },
 
     // 2. 예적금 조회 페이지 (버튼: DepositView)
@@ -74,6 +83,11 @@ const router = createRouter({
       path: '/youtube/video/:id',
       name: 'YoutubeVideoDetailView',
       component: YoutubeVideoDetailView,
+    },
+    {
+      path: '/articles',       // 브라우저 주소창에 표시될 경로
+      name: 'ArticleView',     // 에러 메시지에서 찾고 있던 그 이름! (중요)
+      component: ArticleView   // 위에서 import한 컴포넌트 변수명
     },
 
   ],

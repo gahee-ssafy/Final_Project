@@ -3,8 +3,6 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
-// [핵심] export const useAuthStore <- 이 이름이 중요합니다!
-// HomeView에서 import { useAuthStore } 로 찾고 있기 때문입니다.
 export const useAuthStore = defineStore(
   'auth',
   () => {
@@ -14,37 +12,40 @@ export const useAuthStore = defineStore(
     const API_URL = 'http://127.0.0.1:8000'
 
     // 2. 상태 (State)
-    const token = ref(null) // 로그인 토큰 (Token key or JWT access)
-    const user = ref(null)  // 유저 정보(닉네임 등)
+    const token = ref(null) // 로그인 토큰
+    const user = ref(null)  // 유저 정보
 
     // 3. 파생 상태 (Getters)
-    const isLogin = computed(() => !!token.value)
+    // 토큰이 존재하면 로그인 상태로 간주
+    const isLogin = computed(() => {
+      return token.value !== null && token.value !== ''
+    })
 
-    // ✅ [추가] 로그인한 사용자 정보 가져오기 (nickname/money/salary 등)
-    // 백엔드: GET /accounts/me/  (Authorization: Token <key>)
+    // [F08] 4. 내 정보 가져오기
     const fetchMe = async () => {
       if (!token.value) return null
 
       try {
         const res = await axios({
           method: 'get',
-          url: `${API_URL}/accounts/me/`,
+          url: `${API_URL}/accounts/user/`, // URL 수정 (API_URL 포함)
           headers: {
-            Authorization: `Token ${token.value}`,
+            // [중요] JWT 표준은 'Bearer'입니다. (vue2_교육자료 참조)
+            // 또한 ref 변수는 .value로 접근해야 실제 값 들어갑니다.
+            Authorization: `Bearer ${token.value}`, 
           },
         })
 
         user.value = res.data
         return res.data
       } catch (err) {
-        console.log('me 조회 실패', err)
-        console.log('서버 응답:', err?.response?.status, err?.response?.data)
+        console.error('[F08] 사용자 정보 조회 실패:', err)
+        // 토큰이 만료되었거나 유효하지 않으면 로그아웃 처리할 수도 있음
         return null
       }
     }
 
-    // 4. 회원가입 액션
-    // payload: { username, password1, password2, nickname, money, salary }
+    // 5. 회원가입 액션
     const signUp = (payload) => {
       axios({
         method: 'post',
@@ -52,18 +53,17 @@ export const useAuthStore = defineStore(
         data: payload,
       })
         .then((res) => {
-          console.log('회원가입 성공!', res)
+          console.log('[F08] 회원가입 성공:', res)
           window.alert('회원가입이 완료되었습니다. 로그인 해주세요.')
-          router.push({ name: 'LogInView' }).catch(() => router.push({ name: 'home' }))
+          router.push({ name: 'LogInView' })
         })
         .catch((err) => {
-          console.log('회원가입 실패', err)
-          console.log('서버 응답:', err?.response?.status, err?.response?.data)
+          console.error('[F08] 회원가입 실패:', err)
           window.alert('회원가입에 실패했습니다. 입력 정보를 확인해주세요.')
         })
     }
 
-    // 5. 로그인 액션
+    // 6. 로그인 액션
     const logIn = async (payload) => {
       try {
         const res = await axios({
@@ -72,29 +72,56 @@ export const useAuthStore = defineStore(
           data: payload,
         })
 
-        console.log('로그인 성공!', res)
+        console.log('[F08] 로그인 요청 성공:', res)
 
-        // dj-rest-auth Token 방식: key
-        // JWT 방식이면 access
-        token.value = res.data.key || res.data.access || null
+        // dj-rest-auth 설정에 따라 key 혹은 access로 옴
+        const newToken = res.data.key || res.data.access || null
+        token.value = newToken
 
-        // ✅ [추가] 로그인 직후 내 정보 받아와서 user에 저장
-        await fetchMe()
+        if (newToken) {
+          // 토큰 저장 후 내 정보 갱신 (비동기 처리)
+          await fetchMe()
+          
+          window.alert('로그인되었습니다.')
+          router.replace({ name: 'ArticleView' }) // 메인 페이지나 게시판으로 이동
+        } else {
+          console.warn('[F08] 토큰이 응답에 포함되지 않았습니다.')
+        }
 
-        // 홈으로 이동
-        await router.push({ name: 'home' }).catch(() => router.push('/'))
       } catch (err) {
-        console.log('로그인 실패', err)
-        console.log('서버 응답:', err?.response?.status, err?.response?.data)
+        console.error('[F08] 로그인 실패:', err)
         window.alert('로그인 실패! 아이디와 비밀번호를 확인하세요.')
       }
     }
 
-    // 6. 로그아웃 액션
+    // 7. 로그아웃 액션
     const logOut = () => {
       token.value = null
       user.value = null
-      router.push({ name: 'home' })
+      window.alert('로그아웃 되었습니다.')
+      router.push({ name: 'ArticleView' }) // 로그아웃 후 이동할 페이지
+    }
+
+    // [F08] 8. 회원정보 수정 액션
+    const updateUser = async (payload) => {
+      try {
+        const res = await axios({
+          method: 'put', 
+          url: `${API_URL}/accounts/user/`,
+          headers: {
+            // [수정] JWT 표준인 Bearer로 통일
+            Authorization: `Bearer ${token.value}`,
+          },
+          data: payload,
+        })
+
+        console.log('[F08] 정보 수정 성공:', res.data)
+        user.value = res.data // 수정된 정보를 즉시 상태에 반영
+        window.alert('회원정보가 수정되었습니다.')
+      } catch (err) {
+        console.error('[F08] 정보 수정 실패:', err)
+        window.alert('정보 수정에 실패했습니다.')
+      }
     }
 
     return {
@@ -102,10 +129,11 @@ export const useAuthStore = defineStore(
       token,
       user,
       isLogin,
-      fetchMe, // ✅ export 추가 (필요하면 Home에서도 호출 가능)
+      fetchMe,
       signUp,
       logIn,
       logOut,
+      updateUser,
     }
   },
   {

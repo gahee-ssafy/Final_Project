@@ -18,3 +18,22 @@ class MeView(APIView):
     def get(self, request):
         serializer = UserMeSerializer(request.user)
         return Response(serializer.data)
+
+# F08
+from rest_framework.decorators import api_view, permission_classes
+from .serializers import UserProfileSerializer
+
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    user = request.user
+    if request.method == 'GET':
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data)
+    
+    elif request.method == 'PUT':
+        serializer = UserProfileSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+        
