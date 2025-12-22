@@ -10,7 +10,7 @@
         v-model="query"
         @keyup.enter="searchVideos"
         type="text"
-        placeholder="검색어를 입력하세요 (예: 삼성전자, 적금, 금리, 여행)"
+        placeholder="검색어를 입력하세요 (예: 예적금 추천, 재테크 입문, 월급 관리)"
       />
       <button @click="searchVideos">찾기</button>
     </div>
@@ -31,11 +31,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter, RouterLink } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute, RouterLink } from 'vue-router'
 import VideoCard from '@/components/youtube/VideoCard.vue'
 
 const router = useRouter()
+const route = useRoute()
 
 const query = ref('')
 const videos = ref([])
@@ -46,6 +47,11 @@ const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY
 const searchVideos = async () => {
   const trimmed = query.value.trim()
   if (!trimmed) return
+
+  // ✅ 현재 검색어를 URL에 남겨두기 (/youtube?q=...)
+  if (route.query.q !== trimmed) {
+    router.replace({ name: 'YoutubeSearchView', query: { q: trimmed } }).catch(() => {})
+  }
 
   const params = new URLSearchParams({
     key: API_KEY,
@@ -76,12 +82,25 @@ const searchVideos = async () => {
 }
 
 const goToDetail = (video) => {
+  const trimmed = query.value.trim()
   router.push({
     name: 'YoutubeVideoDetailView',
     params: { id: video.id },
+    // ✅ 상세로 갈 때도 검색어(query)를 같이 들고 간다
+    query: trimmed ? { q: trimmed } : {},
   })
 }
+
+// ✅ 페이지 진입 시 URL에 q가 있으면 자동 검색
+onMounted(() => {
+  const q = (route.query.q || '').toString().trim()
+  if (q) {
+    query.value = q
+    searchVideos()
+  }
+})
 </script>
+
 
 <style scoped>
 .search-page { max-width: 1100px; margin: 0 auto; }

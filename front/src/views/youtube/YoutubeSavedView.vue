@@ -45,6 +45,7 @@ const goToDetail = (video) => {
   router.push({
     name: 'YoutubeVideoDetailView',
     params: { id: video.id },
+    query: { from: 'saved' }, 
   })
 }
 

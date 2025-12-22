@@ -1,6 +1,9 @@
 <template>
   <div class="detail-page">
-    <RouterLink :to="{ name: 'YoutubeSearchView' }" class="back-link">← 뒤로가기</RouterLink>
+    <!-- ✅ 검색어(q) 그대로 들고 SearchView로 돌아가기 -->
+    <RouterLink :to="backTo" class="back-link">
+      ← 뒤로가기
+    </RouterLink>
 
     <div v-if="isLoading" class="status">불러오는 중...</div>
     <div v-else-if="!video" class="status">영상을 찾을 수 없습니다.</div>
@@ -35,6 +38,21 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+
+const backTo = computed(() => {
+  // ✅ Saved 목록에서 들어온 경우
+  if (route.query.from === 'saved') {
+    return { name: 'YoutubeSavedView' }
+  }
+
+  // ✅ 기본: 검색 화면(q 유지)
+  const q = route.query.q ? route.query.q.toString() : ''
+  return {
+    name: 'YoutubeSearchView',
+    query: q ? { q } : {},
+  }
+})
+
 const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY
 
 const STORAGE_KEY = 'firstsalary_youtube_watch_later'
