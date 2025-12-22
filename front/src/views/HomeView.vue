@@ -70,6 +70,15 @@ onMounted(async () => {
           <div class="banner-desc">내 근처 은행 찾기</div>
         </div>
       </RouterLink>
+
+      <RouterLink class="banner" :to="{ name: 'YoutubeSearchView' }">
+        <div class="banner-icon">📺</div>
+        <div class="banner-text">
+          <div class="banner-title">유튜브</div>
+          <div class="banner-desc">관심 종목 영상 보기</div>
+        </div>
+      </RouterLink>
+
     </section>
   </main>
 </template>

@@ -11,6 +11,12 @@ import SignUpView from '@/views/SignUpView.vue'
 
 import MapView from '@/views/MapView.vue'
 
+// F05 유튜브 
+import YoutubeSearchView from '@/views/youtube/YoutubeSearchView.vue'
+import YoutubeVideoDetailView from '@/views/youtube/YoutubeVideoDetailView.vue'
+import YoutubeSavedView from '@/views/youtube/YoutubeSavedView.vue'
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -53,6 +59,23 @@ const router = createRouter({
       name: 'MapView',
       component: MapView
     },
+    // 5. 유튜브
+    {
+      path: '/youtube',
+      name: 'YoutubeSearchView',
+      component: YoutubeSearchView,
+    },
+    {
+      path: '/youtube/saved',
+      name: 'YoutubeSavedView',
+      component: YoutubeSavedView,
+    },
+    {
+      path: '/youtube/video/:id',
+      name: 'YoutubeVideoDetailView',
+      component: YoutubeVideoDetailView,
+    },
+
   ],
 })
 

@@ -1,6 +1,9 @@
 <template>
   <header class="topbar">
-    <div class="brand">첫월급 적금메이트</div>
+    <RouterLink to="/" class="brand-link">
+      첫월급 적금메이트
+    </RouterLink>
+
 
     <nav class="nav" v-if="!store.isLogin">
       <RouterLink class="nav-link" :to="{ name: 'LogInView' }">로그인</RouterLink>
@@ -22,6 +25,17 @@ import { RouterView, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const store = useAuthStore()
+
+
+import { onMounted } from 'vue'
+const auth = useAuthStore()
+
+onMounted(() => {
+  if (auth.isLogin && !auth.user?.nickname) {
+    auth.fetchMe?.()
+  }
+})
+
 </script>
 
 <style scoped>
@@ -38,12 +52,19 @@ const store = useAuthStore()
 }
 
 /* 로고/브랜드 */
-.brand {
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: -0.2px;
-  color: #111;
+.brand-link,
+.brand-link:visited,
+.brand-link:hover,
+.brand-link:active {
+  color: inherit;        /* 기존 글자색 유지 */
+  text-decoration: none; /* 밑줄 제거 */
 }
+
+.brand-link {
+  font-weight: 800;      /* 기존 로고 굵기 유지(필요시) */
+  cursor: pointer;
+}
+
 
 /* 오른쪽 메뉴 */
 .nav {

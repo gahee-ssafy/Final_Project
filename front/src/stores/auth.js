@@ -108,5 +108,11 @@ export const useAuthStore = defineStore(
       logOut,
     }
   },
-  { persist: true }
+  {
+    persist: {
+      key: 'auth',
+      storage: localStorage,
+      paths: ['token', 'user'],
+    },
+  }
 )
