@@ -37,3 +37,17 @@ def profile(request):
             serializer.save()
             return Response(serializer.data)
         
+@api_view(['GET', 'PUT']) # 조회와 수정을 모두 허용
+@permission_classes([IsAuthenticated])
+def user_profile(request):
+    user = request.user
+    if request.method == 'GET':
+        # 여기서 자산 정보나 가입 상품 등을 포함해서 응답합니다.
+        return Response({
+            "username": user.username,
+            "nickname": getattr(user, 'nickname', ''),
+            "email": user.email,
+            "money": getattr(user, 'money', 0),
+            # 가입 상품 데이터 등...
+        })
+    

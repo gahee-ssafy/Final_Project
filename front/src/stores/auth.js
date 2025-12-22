@@ -103,6 +103,19 @@ export const useAuthStore = defineStore(
     }
 
     // [F08] 8. 회원정보 수정 액션
+    // store/auth.js 또는 accounts.js에 정의된 재발급 함수 [cite: 483, 2853, 3787]
+    const refreshAccessToken = function () {
+      return axios({
+        method: 'post',
+        url: `${API_URL}/accounts/token/refresh/`, // URL 확인 필요 [cite: 487, 2857, 3791]
+        data: { refresh: refresh.value }
+      })
+      .then(res => {
+        token.value = res.data.access // 새 Access 토큰으로 갱신 [cite: 495, 2865, 3799]
+        return true
+      })
+      .catch(() => false)
+    }
     const updateUser = async (payload) => {
       try {
         const res = await axios({
@@ -122,6 +135,7 @@ export const useAuthStore = defineStore(
         console.error('[F08] 정보 수정 실패:', err)
         window.alert('정보 수정에 실패했습니다.')
       }
+      
     }
 
     return {
