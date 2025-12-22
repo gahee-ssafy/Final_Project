@@ -162,3 +162,12 @@ CORS_ALLOWED_ORIGINS = [
 # [수정] 백폴더 이식
 # "이제 기본 유저 대신 내가 만든 accounts 앱의 User 모델을 쓸 거야" 라는 뜻
 AUTH_USER_MODEL = 'accounts.User'
+
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
+}
+
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
+}

@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import { onMounted, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth' 
+import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
 
 const store = useAuthStore()
@@ -9,37 +9,45 @@ const loading = ref(false)
 const items = ref([])
 
 // 메인 페이지에 들어오면 '예금' 데이터 6개를 미리보기로 가져옵니다.
-onMounted(() => {
+onMounted(async () => {
+  // ✅ [추가] 로그인 상태인데 user 정보가 없으면(새로고침 등) 내 정보 다시 불러오기
+  if (store.isLogin && !store.user?.nickname && typeof store.fetchMe === 'function') {
+    await store.fetchMe()
+  }
+
   loading.value = true
-  
-  // 백엔드 서버가 꺼져있거나 주소가 틀리면 여기서 에러가 나서 화면이 멈출 수 있음
-  // try-catch 대신 .catch로 방어 코드를 넣어둠
+
   axios({
     method: 'get',
-    url: `${store.API_URL}/api/v1/products/deposit/`
+    url: `${store.API_URL}/api/v1/products/deposit/`,
   })
-  .then((res) => {
-    items.value = Array.isArray(res.data) ? res.data.slice(0, 6) : []
-  })
-  .catch((err) => {
-    console.log('데이터 로드 실패 (백엔드 서버 확인 필요)', err)
-    items.value = [] // 에러 나도 빈 배열로 두어서 화면은 뜨게 함
-  })
-  .finally(() => {
-    loading.value = false
-  })
+    .then((res) => {
+      items.value = Array.isArray(res.data) ? res.data.slice(0, 6) : []
+    })
+    .catch((err) => {
+      console.log('데이터 로드 실패 (백엔드 서버 확인 필요)', err)
+      items.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
 })
 </script>
 
 <template>
   <main class="main-container">
     <section class="hero">
+      <!-- ✅ [추가] 로그인 시 닉네임 환영 문구 -->
+      <p v-if="store.isLogin && store.user?.nickname" class="welcome">
+        안녕하세요, <b>{{ store.user.nickname }}</b>님!
+      </p>
+
       <h1 class="title">사회초년생의 첫 적금 메이트</h1>
       <p class="subtitle">금융 상품 비교부터 금/은 시세까지 한눈에!</p>
     </section>
 
     <section class="banner-grid">
-      <RouterLink class="banner" :to="{ name: 'DepositView' }"> 
+      <RouterLink class="banner" :to="{ name: 'DepositView' }">
         <div class="banner-icon">🏦</div>
         <div class="banner-text">
           <div class="banner-title">예적금 조회</div>
@@ -63,11 +71,17 @@ onMounted(() => {
         </div>
       </RouterLink>
     </section>
-
-    </main>
+  </main>
 </template>
 
 <style scoped>
+/* ✅ [추가] 환영 문구 스타일 */
+.welcome {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  color: #2c3e50;
+}
+
 /* 전체 레이아웃 */
 .main-container {
   max-width: 1000px;
@@ -96,7 +110,7 @@ onMounted(() => {
 /* 2. 배너 그리드 (버튼 3개) */
 .banner-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3열 */
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-bottom: 60px;
 }
@@ -136,7 +150,7 @@ onMounted(() => {
   color: #888;
 }
 
-/* 3. 미리보기 섹션 */
+/* 3. 미리보기 섹션(미사용 중이어도 유지) */
 .section-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -170,6 +184,6 @@ onMounted(() => {
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.8rem;
-  font-weight: 600; }
-
-  </style>
+  font-weight: 600;
+}
+</style>
