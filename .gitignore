@@ -1,6 +1,6 @@
 # Python / Django
 venv/
-*.sqlite3
+
 __pycache__/
 *.py[cod]
 
