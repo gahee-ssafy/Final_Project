@@ -16,6 +16,9 @@ class DepositProducts(models.Model):
     # 우대 조건
     spcl_cnd = models.TextField()
 
+    # [F09] 추가: AI가 만든 숫자를 저장할 공간!
+    embedding_vector = models.JSONField(null=True, blank=True)
+
     def __str__(self):
         return self.fin_prdt_nm
 
