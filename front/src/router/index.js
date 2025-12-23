@@ -27,7 +27,11 @@ import CommunityEditView from '@/views/community/CommunityEditView.vue'
 // ✅ auth store (가드용)
 import { useAuthStore } from '@/stores/auth'
 
-const router = createRouter({     
+
+import AIRecommendView from '@/views/AIRecommendView.vue'
+
+
+const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
@@ -115,6 +119,13 @@ const router = createRouter({
       name: 'CommunityEditView',
       component: CommunityEditView,
     },
+    // 8. AI 상품 추천 페이지 (새로 추가!)
+    {
+      path: '/recommend',
+      name: 'AIRecommendView',
+      component: AIRecommendView,
+    },
+    
     // 목록상세조회
     {
       path: '/deposit/:fin_prdt_cd',

@@ -12,4 +12,6 @@ urlpatterns = [
 
     # community
     path('api/v1/community/', include('community.urls')),
+
+
 ]

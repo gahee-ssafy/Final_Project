@@ -15,6 +15,7 @@ import requests
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from django.conf import settings
+from django.http import JsonResponse
 
 
 # -----------------------------
@@ -157,27 +158,42 @@ def spot_price(request):
     return Response(serializer.data)
 
 
-# -----------------------------
-# [F09] : 사용자 입력 -> 벡터 추천
-# -----------------------------
-def get_recommendations(user_input_text):
+
+# [F09] 추천 기능 
+
+def cosine_similarity(v1, v2):
+    v1, v2 = np.array(v1), np.array(v2)
+    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
+
+@api_view(['POST'])
+def recommend(request):
+    # 1. 프론트엔드에서 보낸 사용자 입력 받기
+    # 하드코딩
+    user_input = request.data.get('message')
+    
+    # 2. 사용자 입력 임베딩 (GMS API)
+    GMS_API_KEY=""
+    
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/embeddings"
-    gms_key = settings.GMS_API_KEY
-    headers = {"Authorization": f"Bearer {gms_key}", "Content-Type": "application/json"}
-
-    payload = {"model": "text-embedding-3-large", "input": user_input_text}
-
+    headers = {"Authorization": f"Bearer {GMS_API_KEY}", "Content-Type": "application/json"}
+    payload = {"model": "text-embedding-3-large", "input": user_input}
+    
     response = requests.post(url, headers=headers, json=payload)
     user_vector = response.json()['data'][0]['embedding']
 
+    # 3. DB 상품들과 유사도 비교
     products = DepositProducts.objects.exclude(embedding_vector__isnull=True)
+    results = []
+    for p in products:
+        score = cosine_similarity(user_vector, p.embedding_vector)
+    
+        results.append({
+            'name': p.fin_prdt_nm,
+            'bank': p.kor_co_nm,
+            'similarity': round(float(score), 4),
+        })
 
-    recommendations = []
-    for product in products:
-        prod_vector = np.array(product.embedding_vector).reshape(1, -1)
-        user_vec_arr = np.array(user_vector).reshape(1, -1)
-        sim_score = cosine_similarity(user_vec_arr, prod_vector)[0][0]
-        recommendations.append({'product': product, 'similarity': sim_score})
-
-    recommendations.sort(key=lambda x: x['similarity'], reverse=True)
-    return recommendations[:3]
+    # 4. 정렬 후 TOP 3 반환
+    results.sort(key=lambda x: x['similarity'], reverse=True)
+    return JsonResponse({'recommendations': results[:3]})
