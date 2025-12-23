@@ -38,7 +38,12 @@ class PostDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'author_username', 'author_nickname', 'created_at', 'updated_at', 'comments']
 
 
+# ✅ 게시글 작성/수정용 (POST/PUT/PATCH)
 class PostWriteSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    author = serializers.CharField(source="author.username", read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ("id", "title", "content", "author", "created_at")

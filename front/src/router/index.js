@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
 import DepositView from '@/views/DepositView.vue'
+import DepositDetailView from '@/views/DepositDetailView.vue'
 import GoldView from '@/views/GoldView.vue'
 
 import LogInView from '@/views/LogInView.vue'
@@ -125,6 +126,12 @@ const router = createRouter({
       component: AIRecommendView,
     },
     
+    // 목록상세조회
+    {
+      path: '/deposit/:fin_prdt_cd',
+      name: 'DepositDetailView',
+      component: DepositDetailView,
+    },
   ],
 })
 
