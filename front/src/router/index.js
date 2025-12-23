@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
 import DepositView from '@/views/DepositView.vue'
+import DepositDetailView from '@/views/DepositDetailView.vue'
 import GoldView from '@/views/GoldView.vue'
 
 import LogInView from '@/views/LogInView.vue'
@@ -26,7 +27,7 @@ import CommunityEditView from '@/views/community/CommunityEditView.vue'
 // ✅ auth store (가드용)
 import { useAuthStore } from '@/stores/auth'
 
-const router = createRouter({
+const router = createRouter({     
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
@@ -113,6 +114,12 @@ const router = createRouter({
       path: '/community/:id/edit',
       name: 'CommunityEditView',
       component: CommunityEditView,
+    },
+    // 목록상세조회
+    {
+      path: '/deposit/:fin_prdt_cd',
+      name: 'DepositDetailView',
+      component: DepositDetailView,
     },
   ],
 })

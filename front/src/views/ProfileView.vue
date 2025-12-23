@@ -4,7 +4,7 @@
 
     <div class="tabs">
       <button :class="{ on: tab === 'edit' }" @click="tab = 'edit'">프로필 편집</button>
-      <button :class="{ on: tab === 'products' }" @click="tab = 'products'">가입상품 확인</button>
+      <button :class="{ on: tab === 'products' }" @click="tab = 'products'">찜한 상품</button>
     </div>
 
     <!-- 공통 메시지 -->
@@ -63,13 +63,13 @@
 
     <!-- 가입상품 확인 -->
     <section v-else class="card">
-      <h3>가입한 상품</h3>
+      <h3>찜한 상품</h3>
 
       <div v-if="loading">불러오는 중...</div>
 
       <div v-else>
         <div v-if="!profile.joined_products || profile.joined_products.length === 0">
-          아직 가입한 상품이 없습니다.
+          아직 찜한 상품이 없습니다.
         </div>
 
         <div v-else>
