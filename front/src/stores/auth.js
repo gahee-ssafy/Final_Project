@@ -10,16 +10,17 @@ export const useAuthStore = defineStore(
 
     const API_URL = 'http://127.0.0.1:8000'
 
-    const token = ref(null)
-    const user = ref(null)
+    // 2. 상태 (State)
+    const token = ref(null) // 로그인 토큰
+    const user = ref(null)  // 유저 정보
 
-    const isLogin = computed(() => !!token.value)
-
-    const authHeader = computed(() => {
-      return token.value ? { Authorization: `Token ${token.value}` } : {}
+    // 3. 파생 상태 (Getters)
+    // 토큰이 존재하면 로그인 상태로 간주
+    const isLogin = computed(() => {
+      return token.value !== null && token.value !== ''
     })
 
-    // ✅ 내 정보 가져오기 (닉네임/username 등)
+    // [F08] 4. 내 정보 가져오기
     const fetchMe = async () => {
       if (!token.value) return
 
@@ -45,13 +46,12 @@ export const useAuthStore = defineStore(
         data: payload,
       })
         .then((res) => {
-          console.log('회원가입 성공!', res)
+          console.log('[F08] 회원가입 성공:', res)
           window.alert('회원가입이 완료되었습니다. 로그인 해주세요.')
-          router.push({ name: 'LogInView' }).catch(() => router.push({ name: 'home' }))
+          router.push({ name: 'LogInView' })
         })
         .catch((err) => {
-          console.log('회원가입 실패', err)
-          console.log('서버 응답:', err?.response?.status, err?.response?.data)
+          console.error('[F08] 회원가입 실패:', err)
           window.alert('회원가입에 실패했습니다. 입력 정보를 확인해주세요.')
         })
     }
@@ -64,13 +64,28 @@ export const useAuthStore = defineStore(
           data: payload,
         })
 
+        console.log('[F08] 로그인 요청 성공:', res)
+
+        // dj-rest-auth 설정에 따라 key 혹은 access로 옴
+        const newToken = res.data.key || res.data.access || null
+        token.value = newToken
+
+        if (newToken) {
+          // 토큰 저장 후 내 정보 갱신 (비동기 처리)
+          await fetchMe()
+          
+          window.alert('로그인되었습니다.')
+          router.replace({ name: 'ArticleView' }) // 메인 페이지나 게시판으로 이동
+        } else {
+          console.warn('[F08] 토큰이 응답에 포함되지 않았습니다.')
+        }
+
         token.value = res.data.key || null
         await fetchMe()
 
         await router.push({ name: 'home' }).catch(() => router.push('/'))
       } catch (err) {
-        console.log('로그인 실패', err)
-        console.log('서버 응답:', err?.response?.status, err?.response?.data)
+        console.error('[F08] 로그인 실패:', err)
         window.alert('로그인 실패! 아이디와 비밀번호를 확인하세요.')
       }
     }
@@ -94,6 +109,7 @@ export const useAuthStore = defineStore(
       signUp,
       logIn,
       logOut,
+      updateUser,
     }
   },
   {

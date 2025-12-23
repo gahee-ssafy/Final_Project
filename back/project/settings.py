@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration', 
     'allauth',
     'allauth.account',
-    'allauth.socialaccount'
+    'allauth.socialaccount',
+    'rest_framework_simplejwt',
 
 ]
 
@@ -171,6 +172,17 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailsSerializer',
+}
+# JWT 인증을 기본으로 사용하도록 설정
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+    'rest_framework_simplejwt.authentication.JWTAuthentication', 
+    ],
+}
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_HTTPONLY': False,
 }
 
 

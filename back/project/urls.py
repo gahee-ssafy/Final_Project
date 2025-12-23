@@ -6,6 +6,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # products 앱의 URL을 /api/v1/products/ 로 시작하게 연결
     path('api/v1/products/', include('products.urls')),
+    # 인증 관련 URl은 accounts로
+    path('accounts/', include('accounts.urls')),   
     # 로그인/회원가입
     path('accounts/', include('dj_rest_auth.urls')),                # 로그인, 로그아웃
     path('accounts/signup/', CustomRegisterView.as_view(), name='rest_register'),

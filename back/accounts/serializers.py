@@ -1,6 +1,26 @@
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
 
+# F08
+from .models import User
+from products.models import DepositProducts, SavingProducts
+
+# F08
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DepositProducts # 예금/적금 구조가 비슷하므로 예시로 작성
+        fields = ('fin_prdt_nm', 'kor_co_nm', 'id')
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    # 가입한 상품의 상세 정보를 포함
+    joined_deposit_products = ProductSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = User
+        fields = ('username', 'nickname', 'age', 'money', 'joined_deposit_products')
+        read_only_fields = ('username',)
+
+
 class CustomRegisterSerializer(RegisterSerializer):
     nickname = serializers.CharField(required=False, allow_blank=True)
     money = serializers.IntegerField(required=False)
