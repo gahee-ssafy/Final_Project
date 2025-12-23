@@ -8,6 +8,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity # 유사도 계산 도구
 from .models import DepositProducts
 from django.conf import settings
+from django.http import JsonResponse
 
 
 # [F03] 예적금 상품 목록 조회
@@ -32,41 +33,41 @@ def spot_price(request):
     return Response(serializer.data)
 
 
-# [F09] : 사용자 입력 -> 벡터 
-def get_recommendations(user_input_text):
-    # 1. GMS API를 통해 사용자 입력을 벡터로 변환
-    url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/embeddings"
-    gms_key = settings.GMS_API_KEY
-    headers = {"Authorization": f"Bearer {gms_key}", "Content-Type": "application/json"}
+
+# [F09] 추천 기능 
+
+def cosine_similarity(v1, v2):
+    v1, v2 = np.array(v1), np.array(v2)
+    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
+
+@api_view(['POST'])
+def recommend(request):
+    # 1. 프론트엔드에서 보낸 사용자 입력 받기
+    # 하드코딩
+    user_input = request.data.get('message')
     
-    payload = {
-        "model": "text-embedding-3-large",
-        "input": user_input_text
-    }
+    # 2. 사용자 입력 임베딩 (GMS API)
+    GMS_API_KEY="S14P02EB04-212fb62d-0aaf-410d-a2ab-27f5f8993de2"
+    
+    url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/embeddings"
+    headers = {"Authorization": f"Bearer {GMS_API_KEY}", "Content-Type": "application/json"}
+    payload = {"model": "text-embedding-3-large", "input": user_input}
     
     response = requests.post(url, headers=headers, json=payload)
     user_vector = response.json()['data'][0]['embedding']
 
-    # 2. DB에서 저장된 모든 상품과 벡터 가져오기
+    # 3. DB 상품들과 유사도 비교
     products = DepositProducts.objects.exclude(embedding_vector__isnull=True)
-    
-    recommendations = []
-    
-    # 3. 코사인 유사도 계산 루프
-    # 교육 자료 4권: 의미적 유사성을 수치화하는 과정
-    for product in products:
-        # DB에 저장된 리스트를 numpy 배열로 변환
-        prod_vector = np.array(product.embedding_vector).reshape(1, -1)
-        user_vec_arr = np.array(user_vector).reshape(1, -1)
-        
-        # 유사도 계산 (0~1 사이 값, 1에 가까울수록 닮음)
-        sim_score = cosine_similarity(user_vec_arr, prod_vector)[0][0]
-        
-        recommendations.append({
-            'product': product,
-            'similarity': sim_score
+    results = []
+    for p in products:
+        score = cosine_similarity(user_vector, p.embedding_vector)
+        results.append({
+            'name': p.fin_prdt_nm,
+            'bank': p.kor_co_nm,
+            'similarity': round(float(score), 4)
         })
 
-    # 4. 유사도 순으로 정렬하여 상위 3개 반환
-    recommendations.sort(key=lambda x: x['similarity'], reverse=True)
-    return recommendations[:3]
+    # 4. 정렬 후 TOP 3 반환
+    results.sort(key=lambda x: x['similarity'], reverse=True)
+    return JsonResponse({'recommendations': results[:3]})

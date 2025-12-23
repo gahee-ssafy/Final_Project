@@ -86,6 +86,14 @@ onMounted(async () => {
           <div class="banner-desc">정보 공유 · 후기 · 질문</div>
         </div>
       </RouterLink>
+      <RouterLink class="banner" :to="{ name: 'AIRecommendView' }">
+        <div class="banner-icon">🤖</div>
+        <div class="banner-text">
+          <div class="banner-title">AI</div>
+          <div class="banner-desc">사회초년생 맞춤 AI 추천</div>
+        </div>
+      </RouterLink>
+      
 
     </section>
   </main>

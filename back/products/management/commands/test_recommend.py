@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
         # 2. GMS API 호출 (사용자 입력을 숫자로 변환하는 과정 - 필수!)
         url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/embeddings"
-        gms_key = settings.GMS_API_KEY
+        gms_key = "S14P02EB04-212fb62d-0aaf-410d-a2ab-27f5f8993de2"
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {gms_key}"}
         payload = {"model": "text-embedding-3-large", "input": user_input}
 

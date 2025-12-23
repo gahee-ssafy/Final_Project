@@ -8,7 +8,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # 1. 환경 설정 (Bash의 -H 부분)
         url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/embeddings"
-        gms_key = settings.GMS_API_KEY
+        gms_key = "S14P02EB04-212fb62d-0aaf-410d-a2ab-27f5f8993de2"
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {gms_key}"
@@ -35,8 +35,8 @@ class Command(BaseCommand):
                 embedding = response.json()['data'][0]['embedding']
                 
                 # 5. DB에 영구 저장
-                products.embedding_vector = embedding
-                products.save()
+                product.embedding_vector = embedding
+                product.save()
                 self.stdout.write(self.style.SUCCESS(f"상품 [{product.id}] 임베딩 저장 완료!"))
             else:
                 self.stdout.write(self.style.ERROR(f"에러 발생: {response.status_code} - {response.text}"))
