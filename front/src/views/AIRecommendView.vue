@@ -28,6 +28,7 @@
           <div class="product-info">
             <span class="bank-name">{{ item.bank }}</span>
             <h4 class="product-name">{{ item.name }}</h4>
+            <h4 class="product-rates">{{ item.max_rate }} %</h4>
           </div>
           <div class="similarity-score">
             AI 매칭률: <strong>{{ (item.similarity * 100).toFixed(1) }}%</strong>
