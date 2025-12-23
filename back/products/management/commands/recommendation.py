@@ -8,7 +8,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # 1. 환경 설정 (Bash의 -H 부분)
         url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/embeddings"
-        gms_key = "S14P02EB04-212fb62d-0aaf-410d-a2ab-27f5f8993de2"
+        gms_key = ""
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {gms_key}"

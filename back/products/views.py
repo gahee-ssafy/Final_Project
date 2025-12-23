@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import DepositProducts, SpotPrice
+from .models import DepositProducts, SpotPrice, DepositOptions
 from .serializers import DepositProductsSerializer, SpotPriceSerializer
 
 import requests
@@ -48,7 +48,7 @@ def recommend(request):
     user_input = request.data.get('message')
     
     # 2. 사용자 입력 임베딩 (GMS API)
-    GMS_API_KEY="S14P02EB04-212fb62d-0aaf-410d-a2ab-27f5f8993de2"
+    GMS_API_KEY=""
     
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/embeddings"
     headers = {"Authorization": f"Bearer {GMS_API_KEY}", "Content-Type": "application/json"}
@@ -62,10 +62,11 @@ def recommend(request):
     results = []
     for p in products:
         score = cosine_similarity(user_vector, p.embedding_vector)
+    
         results.append({
             'name': p.fin_prdt_nm,
             'bank': p.kor_co_nm,
-            'similarity': round(float(score), 4)
+            'similarity': round(float(score), 4),
         })
 
     # 4. 정렬 후 TOP 3 반환
