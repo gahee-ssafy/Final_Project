@@ -7,6 +7,8 @@
     <nav class="nav" v-if="!store.isLogin">
       <RouterLink class="nav-link" :to="{ name: 'LogInView' }">로그인</RouterLink>
       <RouterLink class="nav-link" :to="{ name: 'SignUpView' }">회원가입</RouterLink>
+      <RouterLink class="nav-link" :to="{ name: 'CommunityListView' }">커뮤니티</RouterLink>
+
     </nav>
 
     <nav class="nav" v-else>
@@ -72,15 +74,20 @@ onMounted(() => {
   font-size: 14px;
   color: #111;
   text-decoration: none;
-  padding: 6px 8px;
+}
+
+.nav-link {
+  padding: 8px 10px;
   border-radius: 10px;
   transition: background 0.15s ease;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .nav-link:hover {
-  background: #f5f5f5;
+  background: rgba(0, 0, 0, 0.05);
 }
+
 
 /* 본문 컨테이너 */
 .container {

@@ -19,6 +19,12 @@ import YoutubeSavedView from '@/views/youtube/YoutubeSavedView.vue'
 // F08
 import ProfileView from '@/views/ProfileView.vue'
 import ArticleView from '@/views/ArticleView.vue'
+// F07 커뮤니티
+import CommunityListView from '@/views/community/CommunityListView.vue'
+import CommunityDetailView from '@/views/community/CommunityDetailView.vue'
+import CommunityCreateView from '@/views/community/CommunityCreateView.vue'
+import CommunityEditView from '@/views/community/CommunityEditView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -88,6 +94,26 @@ const router = createRouter({
       path: '/articles',       // 브라우저 주소창에 표시될 경로
       name: 'ArticleView',     // 에러 메시지에서 찾고 있던 그 이름! (중요)
       component: ArticleView   // 위에서 import한 컴포넌트 변수명
+    // 7. 커뮤니티
+    {
+      path: '/community',
+      name: 'CommunityListView',
+      component: CommunityListView,
+    },
+    {
+      path: '/community/create',
+      name: 'CommunityCreateView',
+      component: CommunityCreateView,
+    },
+    {
+      path: '/community/:id',
+      name: 'CommunityDetailView',
+      component: CommunityDetailView,
+    },
+    {
+      path: '/community/:id/edit',
+      name: 'CommunityEditView',
+      component: CommunityEditView,
     },
 
   ],

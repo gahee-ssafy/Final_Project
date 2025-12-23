@@ -79,6 +79,14 @@ onMounted(async () => {
         </div>
       </RouterLink>
 
+      <RouterLink class="banner" :to="{ name: 'CommunityListView' }">
+        <div class="banner-icon">💬</div>
+        <div class="banner-text">
+          <div class="banner-title">커뮤니티</div>
+          <div class="banner-desc">정보 공유 · 후기 · 질문</div>
+        </div>
+      </RouterLink>
+
     </section>
   </main>
 </template>
@@ -116,13 +124,14 @@ onMounted(async () => {
   line-height: 1.6;
 }
 
-/* 2. 배너 그리드 (버튼 3개) */
+
 .banner-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
   margin-bottom: 60px;
 }
+
 
 .banner {
   display: flex;
