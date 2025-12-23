@@ -16,6 +16,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from django.conf import settings
 from django.http import JsonResponse
+from django.db.models import Max
 
 
 # -----------------------------
@@ -183,17 +184,25 @@ def recommend(request):
     user_vector = response.json()['data'][0]['embedding']
 
     # 3. DB 상품들과 유사도 비교
-    products = DepositProducts.objects.exclude(embedding_vector__isnull=True)
+    products = DepositProducts.objects.all().prefetch_related('options') 
     results = []
+    
     for p in products:
         score = cosine_similarity(user_vector, p.embedding_vector)
-    
+        # ✅ [수정 포인트] 'depositoptions_set' 대신 설정한 'related_name'을 쓰세요! -> options
+        try:
+            max_rate = p.options.aggregate(Max('intr_rate2'))['intr_rate2__max']
+        except AttributeError:
+            max_rate = 0
+
         results.append({
             'name': p.fin_prdt_nm,
             'bank': p.kor_co_nm,
             'similarity': round(float(score), 4),
+            'max_rate': max_rate if max_rate else 0
         })
 
     # 4. 정렬 후 TOP 3 반환
     results.sort(key=lambda x: x['similarity'], reverse=True)
     return JsonResponse({'recommendations': results[:3]})
+
