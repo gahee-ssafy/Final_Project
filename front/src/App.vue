@@ -4,16 +4,19 @@
       첫월급 적금메이트
     </RouterLink>
 
-
-    <nav class="nav" v-if="!store.isLogin">
+    <!-- 비로그인 -->
+    <nav class="nav" v-if="!auth.isLogin">
       <RouterLink class="nav-link" :to="{ name: 'LogInView' }">로그인</RouterLink>
       <RouterLink class="nav-link" :to="{ name: 'SignUpView' }">회원가입</RouterLink>
       <RouterLink class="nav-link" :to="{ name: 'CommunityListView' }">커뮤니티</RouterLink>
-
     </nav>
 
+    <!-- 로그인 -->
     <nav class="nav" v-else>
-      <a class="nav-link" href="#" @click.prevent="store.logOut()">로그아웃</a>
+      <!-- ✅ F08 마이페이지 링크 추가 -->
+      <RouterLink class="nav-link" :to="{ name: 'ProfileView' }">마이페이지</RouterLink>
+
+      <a class="nav-link" href="#" @click.prevent="auth.logOut()">로그아웃</a>
     </nav>
   </header>
 
@@ -25,19 +28,16 @@
 <script setup>
 import { RouterView, RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-
-const store = useAuthStore()
-
-
 import { onMounted } from 'vue'
+
 const auth = useAuthStore()
 
+// 로그인 상태인데 user 정보(닉네임 등)가 비어있으면 서버에서 받아오기
 onMounted(() => {
   if (auth.isLogin && !auth.user?.nickname) {
     auth.fetchMe?.()
   }
 })
-
 </script>
 
 <style scoped>
@@ -58,15 +58,14 @@ onMounted(() => {
 .brand-link:visited,
 .brand-link:hover,
 .brand-link:active {
-  color: inherit;        /* 기존 글자색 유지 */
-  text-decoration: none; /* 밑줄 제거 */
+  color: inherit;
+  text-decoration: none;
 }
 
 .brand-link {
-  font-weight: 800;      /* 기존 로고 굵기 유지(필요시) */
+  font-weight: 800;
   cursor: pointer;
 }
-
 
 /* 오른쪽 메뉴 */
 .nav {
@@ -95,7 +94,6 @@ onMounted(() => {
   background: rgba(0, 0, 0, 0.05);
 }
 
-
 /* 본문 컨테이너 */
 .container {
   max-width: 1100px;
@@ -107,9 +105,6 @@ onMounted(() => {
 @media (max-width: 480px) {
   .topbar {
     padding: 0 14px;
-  }
-  .brand {
-    font-size: 15px;
   }
   .nav {
     gap: 8px;
