@@ -1,7 +1,7 @@
 <template>
   <header class="topbar">
     <RouterLink to="/" class="brand-link">
-      첫월급 적금메이트
+      JJuns 딜러
     </RouterLink>
 
     <!-- 비로그인 -->
@@ -44,27 +44,29 @@ onMounted(() => {
 /* 상단바 */
 .topbar {
   height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   padding: 0 22px;
-  background: #fff;
-  border-bottom: 1px solid #eee;
+  background: rgba(255, 246, 232, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-bottom: 1px solid rgba(47, 36, 26, 0.10);
 }
 
 /* 로고/브랜드 */
 .brand-link,
 .brand-link:visited,
-.brand-link:hover,
-.brand-link:active {
-  color: inherit;
-  text-decoration: none;
-}
-
-.brand-link {
-  font-weight: 800;
-  cursor: pointer;
+.brand-link:hover {
+  font-weight: 950;
+  letter-spacing: -0.4px;
+  color: rgba(47, 36, 26, 0.92);
 }
 
 /* 오른쪽 메뉴 */
@@ -76,29 +78,24 @@ onMounted(() => {
 
 /* 링크 */
 .nav-link,
-.nav-link:visited,
-.nav-link:hover,
-.nav-link:active {
-  color: inherit;
-  text-decoration: none;
-}
-
-.nav-link {
+.nav-link:visited {
   padding: 8px 10px;
-  border-radius: 10px;
+  border-radius: 12px;
+  color: rgba(47, 36, 26, 0.85);
   font-weight: 700;
-  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .nav-link:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(47, 36, 26, 0.06);
+  transform: translateY(-1px);
 }
 
 /* 본문 컨테이너 */
 .container {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 18px;
+  padding: 18px 18px 26px;
 }
 
 /* 모바일에서 간격 조정 */
@@ -110,7 +107,8 @@ onMounted(() => {
     gap: 8px;
   }
   .nav-link {
-    padding: 6px 6px;
+    padding: 7px 8px;
   }
 }
 </style>
+

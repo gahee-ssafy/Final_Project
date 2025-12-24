@@ -15,7 +15,7 @@ const startDate = ref('')         // 'YYYY-MM-DD' or ''
 const endDate = ref('')           // 'YYYY-MM-DD' or ''
 const errorMsg = ref('')
 
-// "조회" 버튼을 눌意味로만 필터 적용되게(원하면 즉시 필터로 바꿔도 됨)
+// "조회" 버튼을 눌로만 필터 적용되게(원하면 즉시 필터로 바꿔도 됨)
 const appliedStart = ref('')
 const appliedEnd = ref('')
 
