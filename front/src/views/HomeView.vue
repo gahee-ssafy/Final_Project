@@ -1,21 +1,34 @@
 <script setup>
-import { RouterLink, useRouter } from 'vue-router'
 import { onMounted, ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
 
 const router = useRouter()
 const store = useAuthStore()
 
-// 예적금 미리보기(실데이터)
+/* ---------------------------
+   ✅ 오늘의 팁(페이드 등장)
+--------------------------- */
+const tips = [
+  '💰 첫 월급의 50%는 무조건 저축하는 습관을 들여보세요!',
+  '📌 소비 전 “필요 vs 욕구”를 10초만 구분해보면 지출이 줄어요.',
+  '🧾 고정지출(통신/구독)을 먼저 줄이면 절약이 쉬워요.',
+  '🏦 우대금리 조건(급여이체/자동이체)을 체크하면 체감수익이 커져요.',
+  '📈 적금은 “목표 금액/기간”부터 정하면 선택이 쉬워요.',
+]
+const todayTip = ref('')
+const showTip = ref(false)
+
+/* ---------------------------
+   ✅ 예적금 / 커뮤니티 / 시세 데이터
+--------------------------- */
 const loading = ref(false)
 const items = ref([])
 
-// 커뮤니티 최신글(실데이터)
 const loadingPosts = ref(false)
 const posts = ref([])
 
-// 금/은 시세(실데이터)
 const loadingSpot = ref(false)
 const spotList = ref([])
 
@@ -24,7 +37,6 @@ const latestPosts = computed(() => (Array.isArray(posts.value) ? posts.value.sli
 
 const formatDate = (iso) => (iso ? String(iso).slice(0, 10) : '')
 
-// 예적금 금리 표시용(필드명이 팀마다 달라서 안전하게)
 const pickRate = (p) => {
   const candidates = [p?.intr_rate2, p?.max_intr_rate, p?.intr_rate, p?.highest_rate, p?.best_rate]
   const n = candidates.find((v) => typeof v === 'number')
@@ -78,7 +90,6 @@ const fetchSpot = async () => {
   }
 }
 
-// GoldView와 동일한 방식: base_date 기준 최신 1개 뽑기
 const latestSpotOf = (name) => {
   const arr = (spotList.value || []).filter((x) => x.item_name === name)
   if (arr.length === 0) return null
@@ -91,30 +102,18 @@ const silverSpot = computed(() => latestSpotOf('Silver'))
 const spotBaseDate = computed(() => {
   const g = goldSpot.value?.base_date
   const s = silverSpot.value?.base_date
-  // 둘 중 하나만 있으면 그 날짜, 둘 다 있으면 더 최신 날짜
   if (!g && !s) return ''
   if (g && !s) return g
   if (!g && s) return s
   return g > s ? g : s
 })
 
-
-
-
-// --- [추가] 2번 기능: 오늘의 금융 팁 데이터 ---
-const tips = [
-  "💰 첫 월급의 50%는 무조건 저축하는 습관을 들여보세요!",
-  "🏦 적금 이율도 중요하지만, 우대 금리 조건을 꼼꼼히 확인하세요.",
-  "💳 신용카드보다는 체크카드를 사용하는 것이 연말정산에 유리해요.",
-  "📈 금/은 투자는 분산 투자 차원에서 접근하는 것이 좋습니다.",
-  "💡 비상금은 월 지출의 3~6배 정도를 별도 통장에 보관하세요."
-]
-const todayTip = ref("")
-
-// --- [추가] 3번 기능: 목표 달성 계산기 로직 ---
+/* ---------------------------
+   ✅ 목표 달성 계산기 로직(그대로 유지)
+--------------------------- */
 const calcAmount = ref(500000) // 매월 저축액
-const calcMonths = ref(12)      // 저축 기간
-const calcRate = ref(4.0)       // 이자율
+const calcMonths = ref(12) // 저축 기간
+const calcRate = ref(4.0) // 이자율
 
 const expectedResult = computed(() => {
   const p = calcAmount.value
@@ -129,102 +128,56 @@ const expectedResult = computed(() => {
   return total.toLocaleString()
 })
 
+/* ---------------------------
+   ✅ onMounted: 팁 선택 + 페이드 등장 + 기존 데이터 로드
+--------------------------- */
 onMounted(async () => {
-  // 1. 페이지 로드 시 랜덤으로 팁 하나 선택 (추가된 한 줄)
+  // 1) 랜덤 팁 선택
   todayTip.value = tips[Math.floor(Math.random() * tips.length)]
 
-  // 2. 기존 로그인 유저 정보 확인 로직
+  // 2) ✅ 팁을 약간 늦게 페이드로 등장
+  setTimeout(() => {
+    showTip.value = true
+  }, 350)
+
+  // 3) 기존 로그인 유저 정보 확인 로직
   if (store.isLogin && !store.user?.nickname && typeof store.fetchMe === 'function') {
     await store.fetchMe()
   }
 
-  // 3. 기존 데이터들(예적금, 커뮤니티, 시세) 한꺼번에 가져오기
+  // 4) 기존 데이터들(예적금, 커뮤니티, 시세) 한꺼번에 가져오기
   await Promise.all([fetchDeposits(), fetchCommunity(), fetchSpot()])
 })
-
-
-
-
-
-
-
-
-
-
 </script>
+
 
 <template>
   <main class="home">
+    <!-- ✅ 1) 첫 화면: Hero + Tip (Tip은 hero 안에서 페이드 등장) -->
     <section class="hero">
       <p v-if="store.isLogin && store.user?.nickname" class="welcome">
         안녕하세요, <b>{{ store.user.nickname }}</b>님!
       </p>
-        <h1 class="title">
-          <span class="title-weak">사회초년생의</span>
-          <span class="title-strong">첫 적금 메이트</span>
-        </h1>
-        <p class="subtitle">금융 상품 비교부터 <b>금/은 시세</b>까지 한눈에!</p>
+
+      <h1 class="title">
+        <span class="title-weak">사회초년생의</span>
+        <span class="title-strong">첫 적금 메이트</span>
+      </h1>
+
+      <p class="subtitle">금융 상품 비교부터 <b>금/은 시세</b>까지 한눈에!</p>
+
+      <!-- ✅ Tip: 첫 로딩 때 페이드인(지연 등장) -->
+      <transition name="fade-up">
+        <div class="tip-bar" v-if="showTip && todayTip">
+          <div class="tip-content">
+            <span class="tip-badge">💡 오늘의 팁</span>
+            <p class="tip-text">{{ todayTip }}</p>
+          </div>
+        </div>
+      </transition>
     </section>
 
-
-    <div class="tip-bar" v-if="todayTip">
-      <div class="tip-content">
-        <span class="tip-badge">💡 오늘의 팁</span>
-        <p class="tip-text">{{ todayTip }}</p>
-      </div>
-    </div>
-
-    <section class="banner-grid">
-      <RouterLink class="banner banner--deposit" :to="{ name: 'DepositView' }">
-        <div class="icon-box" aria-hidden="true">🏦</div>
-        <div class="banner-text">
-          <div class="banner-title">예적금 조회</div>
-          <div class="banner-desc">예금·적금 상품 한눈에</div>
-        </div>
-      </RouterLink>
-
-      <RouterLink class="banner banner--metal" :to="{ name: 'GoldView' }">
-        <div class="icon-box" aria-hidden="true">🥇</div>
-        <div class="banner-text">
-          <div class="banner-title">금/은 시세</div>
-          <div class="banner-desc">실시간 현물 시세 확인</div>
-        </div>
-      </RouterLink>
-
-      <RouterLink class="banner banner--map" :to="{ name: 'MapView' }">
-        <div class="icon-box" aria-hidden="true">🗺️</div>
-        <div class="banner-text">
-          <div class="banner-title">지도 조회</div>
-          <div class="banner-desc">내 근처 은행 찾기</div>
-        </div>
-      </RouterLink>
-
-      <RouterLink class="banner banner--youtube" :to="{ name: 'YoutubeSearchView' }">
-        <div class="icon-box" aria-hidden="true">📺</div>
-        <div class="banner-text">
-          <div class="banner-title">유튜브</div>
-          <div class="banner-desc">관심 종목 영상 보기</div>
-        </div>
-      </RouterLink>
-
-      <RouterLink class="banner banner--community" :to="{ name: 'CommunityListView' }">
-        <div class="icon-box" aria-hidden="true">💬</div>
-        <div class="banner-text">
-          <div class="banner-title">커뮤니티</div>
-          <div class="banner-desc">정보 공유 · 후기 · 질문</div>
-        </div>
-      </RouterLink>
-
-      <RouterLink class="banner banner--ai" :to="{ name: 'AIRecommendView' }">
-        <div class="icon-box" aria-hidden="true">🤖</div>
-        <div class="banner-text">
-          <div class="banner-title">AI</div>
-          <div class="banner-desc">사회초년생 맞춤 AI 추천</div>
-        </div>
-      </RouterLink>
-    </section>
-
-    <!-- ✅ 하단 대시보드 -->
+    <!-- ✅ 2) 아래는 스크롤하면 보이는 대시보드 -->
     <section class="bottom">
       <!-- 상단 요약 3카드 -->
       <div class="summary-grid">
@@ -240,8 +193,12 @@ onMounted(async () => {
           </div>
 
           <div v-else class="deposit-mini">
-            <button v-for="p in topDeposits" :key="p.fin_prdt_cd || p.id || p.fin_prdt_nm" class="deposit-row"
-              @click="goDepositDetail(p)">
+            <button
+              v-for="p in topDeposits"
+              :key="p.fin_prdt_cd || p.id || p.fin_prdt_nm"
+              class="deposit-row"
+              @click="goDepositDetail(p)"
+            >
               <div class="deposit-left">
                 <div class="deposit-name">{{ p.fin_prdt_nm || p.product_name || '예적금 상품' }}</div>
                 <div class="deposit-bank">{{ p.kor_co_nm || p.bank_name || '은행' }}</div>
@@ -281,23 +238,18 @@ onMounted(async () => {
             </div>
 
             <div class="spot-row">
-              <span class="spot-label">🟡 금
-                <span class="text-xs"> g당 </span>
-              </span>
+              <span class="spot-label">🟡 금 <span class="text-xs">g당</span></span>
               <span class="spot-price">
                 <span>$</span>
-                {{ goldSpot ? Number(goldSpot.price).toLocaleString() + '' : '—' }}
+                {{ goldSpot ? Number(goldSpot.price).toLocaleString() : '—' }}
               </span>
             </div>
 
             <div class="spot-row">
-              <span class="spot-label">⚪ 은
-                <span class="text-xs"> g당 </span>
-              </span>
+              <span class="spot-label">⚪ 은 <span class="text-xs">g당</span></span>
               <span class="spot-price">
                 <span>$</span>
-
-                {{ silverSpot ? Number(silverSpot.price).toLocaleString() + '' : '—' }}
+                {{ silverSpot ? Number(silverSpot.price).toLocaleString() : '—' }}
               </span>
             </div>
 
@@ -319,8 +271,12 @@ onMounted(async () => {
           <div v-else-if="latestPosts.length === 0" class="mini-empty">아직 게시글이 없어요.</div>
 
           <div v-else class="post-list">
-            <button v-for="p in latestPosts" :key="p.id" class="post-row"
-              @click="router.push({ name: 'CommunityDetailView', params: { id: p.id } })">
+            <button
+              v-for="p in latestPosts"
+              :key="p.id"
+              class="post-row"
+              @click="router.push({ name: 'CommunityDetailView', params: { id: p.id } })"
+            >
               <div class="post-title">{{ p.title }}</div>
               <div class="post-meta">
                 <span>{{ p.author_nickname || p.author_username }}</span>
@@ -368,9 +324,7 @@ onMounted(async () => {
           </ol>
         </div>
 
-
-
-
+        <!-- 목표 달성 계산기 -->
         <div class="panel calc-panel">
           <div class="panel-head">
             <div class="panel-title">💰 목표 달성 계산기</div>
@@ -390,10 +344,12 @@ onMounted(async () => {
             </div>
           </div>
         </div>
+
       </div>
     </section>
   </main>
 </template>
+
 
 <style scoped>
 .home {
@@ -407,6 +363,10 @@ onMounted(async () => {
   margin: 0 auto 22px;
   padding: 30px 18px 18px;
   text-align: center;
+  min-height: 58vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* 좌/우 일러스트 */
@@ -1019,4 +979,19 @@ onMounted(async () => {
     border-radius: 20px;
   }
 }
+
+
+/* ✅ Tip fade-up transition */
+.fade-up-enter-active {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.fade-up-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.fade-up-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 </style>
