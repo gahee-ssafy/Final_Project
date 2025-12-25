@@ -150,7 +150,7 @@ const chartTitle = computed(() => (asset.value === 'Gold' ? '금(Gold) 가격' :
             <tr>
               <th>품목</th>
               <th>기준일</th>
-              <th>시세 (원)</th>
+              <th>시세 ($)</th>
             </tr>
           </thead>
           <tbody>
@@ -160,7 +160,7 @@ const chartTitle = computed(() => (asset.value === 'Gold' ? '금(Gold) 가격' :
                 <span v-else>⚪ 은 (Silver)</span>
               </td>
               <td>{{ item.base_date }}</td>
-              <td class="price">{{ Number(item.price).toLocaleString() }}원</td>
+              <td class="price">$ {{ Number(item.price).toLocaleString() }}</td>
             </tr>
           </tbody>
         </table>

@@ -31,3 +31,16 @@ svg {
   margin-left: auto;
   margin-right: auto;
 }
+
+
+html, body, #app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 15% 25%, rgba(255, 209, 128, 0.35), transparent 55%),
+              radial-gradient(circle at 85% 30%, rgba(168, 214, 255, 0.35), transparent 55%),
+              rgba(255, 249, 240, 0.95);
+  background-attachment: fixed; /* ✅ 스크롤 시 끊김 방지 */
+}

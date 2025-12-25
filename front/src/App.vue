@@ -1,14 +1,14 @@
 <template>
   <header class="topbar">
     <div class="topbar-inner">
-      <RouterLink to="/" class="brand-link">JJuns 딜러</RouterLink>
+      <RouterLink to="/" class="brand-link">JJuns 메이트</RouterLink>
 
       <!-- ✅ 데스크탑 메뉴(가로) -->
       <nav class="nav desktop">
         <RouterLink class="nav-link" :to="{ name: 'DepositView' }">🏦 예적금</RouterLink>
         <RouterLink class="nav-link" :to="{ name: 'GoldView' }">🥇 금/은</RouterLink>
-        <RouterLink class="nav-link" :to="{ name: 'MapView' }">🗺️ 지도</RouterLink>
-        <RouterLink class="nav-link" :to="{ name: 'YoutubeSearchView' }">📺 유튜브</RouterLink>
+        <RouterLink class="nav-link" :to="{ name: 'MapView' }">🗺️ 내 주변 은행</RouterLink>
+        <RouterLink class="nav-link" :to="{ name: 'YoutubeSearchView' }">📺 관심 종목 검색</RouterLink>
         <RouterLink class="nav-link" :to="{ name: 'CommunityListView' }">💬 커뮤니티</RouterLink>
         <RouterLink class="nav-link" :to="{ name: 'AIRecommendView' }">🤖 AI</RouterLink>
       </nav>

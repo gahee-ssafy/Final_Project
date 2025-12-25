@@ -174,7 +174,7 @@ def recommend(request):
     user_input = request.data.get('message')
     
     # 2. 사용자 입력 임베딩 (GMS API)
-    GMS_API_KEY=""
+    GMS_API_KEY="S14P02EB04-212fb62d-0aaf-410d-a2ab-27f5f8993de2"
     
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/embeddings"
     headers = {"Authorization": f"Bearer {GMS_API_KEY}", "Content-Type": "application/json"}

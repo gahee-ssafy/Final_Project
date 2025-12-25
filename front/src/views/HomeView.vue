@@ -153,7 +153,6 @@ onMounted(async () => {
 
 <template>
   <main class="home">
-    <!-- ✅ 1) 첫 화면: Hero + Tip (Tip은 hero 안에서 페이드 등장) -->
     <section class="hero">
       <p v-if="store.isLogin && store.user?.nickname" class="welcome">
         안녕하세요, <b>{{ store.user.nickname }}</b>님!
@@ -166,7 +165,6 @@ onMounted(async () => {
 
       <p class="subtitle">금융 상품 비교부터 <b>금/은 시세</b>까지 한눈에!</p>
 
-      <!-- ✅ Tip: 첫 로딩 때 페이드인(지연 등장) -->
       <transition name="fade-up">
         <div class="tip-bar" v-if="showTip && todayTip">
           <div class="tip-content">
@@ -177,10 +175,61 @@ onMounted(async () => {
       </transition>
     </section>
 
-    <!-- ✅ 2) 아래는 스크롤하면 보이는 대시보드 -->
+    <!-- ✅ 6개 바로가기 배너 (첫 화면 하단) -->
+<section class="banner-grid">
+  <RouterLink class="banner b-orange" :to="{ name: 'DepositView' }">
+    <div class="icon-box">🏦</div>
+    <div class="banner-text">
+      <div class="banner-title">예적금 조회</div>
+      <div class="banner-desc">예금·적금 상품 한눈에</div>
+    </div>
+  </RouterLink>
+
+  <RouterLink class="banner b-yellow" :to="{ name: 'GoldView' }">
+    <div class="icon-box">🥇</div>
+    <div class="banner-text">
+      <div class="banner-title">금/은 시세</div>
+      <div class="banner-desc">실시간 현물 시세 확인</div>
+    </div>
+  </RouterLink>
+
+  <RouterLink class="banner b-blue" :to="{ name: 'MapView' }">
+    <div class="icon-box">🗺️</div>
+    <div class="banner-text">
+      <div class="banner-title">지도 조회</div>
+      <div class="banner-desc">내 근처 은행 찾기</div>
+    </div>
+  </RouterLink>
+
+  <RouterLink class="banner b-peach" :to="{ name: 'YoutubeSearchView' }">
+    <div class="icon-box">📺</div>
+    <div class="banner-text">
+      <div class="banner-title">유튜브</div>
+      <div class="banner-desc">관심 종목 영상 보기</div>
+    </div>
+  </RouterLink>
+
+  <RouterLink class="banner b-sky" :to="{ name: 'CommunityListView' }">
+    <div class="icon-box">💬</div>
+    <div class="banner-text">
+      <div class="banner-title">커뮤니티</div>
+      <div class="banner-desc">정보 공유 · 후기 · 질문</div>
+    </div>
+  </RouterLink>
+
+  <RouterLink class="banner b-purple" :to="{ name: 'AIRecommendView' }">
+    <div class="icon-box">🤖</div>
+    <div class="banner-text">
+      <div class="banner-title">AI</div>
+      <div class="banner-desc">사회초년생 맞춤 AI 추천</div>
+    </div>
+  </RouterLink>
+</section>
+
+
     <section class="bottom">
-      <!-- 상단 요약 3카드 -->
       <div class="summary-grid">
+        <!-- 1) 오늘의 예적금 미리보기 -->
         <div class="summary-card">
           <div class="summary-head">
             <div class="summary-title">오늘의 예적금 미리보기</div>
@@ -212,17 +261,31 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div class="summary-card">
+        <!-- ✅ 2) (AI 맞춤 추천 카드 완전 삭제) → 목표 달성 계산기 배치 -->
+        <div class="summary-card calc-panel">
           <div class="summary-head">
-            <div class="summary-title">AI 맞춤 추천</div>
+            <div class="summary-title">💰 목표 달성 계산기</div>
           </div>
-          <p class="summary-desc">
-            {{ store.isLogin ? '내 조건으로 바로 추천 받아보세요.' : '로그인 후 나에게 맞는 상품을 추천받아보세요.' }}
-          </p>
-          <RouterLink class="cta" :to="{ name: 'AIRecommendView' }">추천 받으러 가기 →</RouterLink>
-          <div class="summary-note">입력 → 규칙/가중치 → 추천 + 사유</div>
+
+          <div class="calc-body">
+            <div class="calc-input-row">
+              <label>매달 <b>{{ (calcAmount / 10000).toLocaleString() }}만</b>원씩</label>
+              <input type="range" v-model.number="calcAmount" min="100000" max="2000000" step="100000" />
+            </div>
+
+            <div class="calc-input-row">
+              <label><b>{{ calcMonths }}개월</b> 동안 모으면?</label>
+              <input type="range" v-model.number="calcMonths" min="6" max="36" step="6" />
+            </div>
+
+            <div class="calc-result-box">
+              <span class="result-label">만기 예상 수령액(세전)</span>
+              <div class="result-value">약 <span>{{ expectedResult }}</span>원</div>
+            </div>
+          </div>
         </div>
 
+        <!-- 3) 금/은 시세 -->
         <div class="summary-card">
           <div class="summary-head">
             <div class="summary-title">금/은 시세</div>
@@ -238,7 +301,7 @@ onMounted(async () => {
             </div>
 
             <div class="spot-row">
-              <span class="spot-label">🟡 금 <span class="text-xs">g당</span></span>
+              <span class="spot-label">🟡 금 <span class="text-xs">/oz</span></span>
               <span class="spot-price">
                 <span>$</span>
                 {{ goldSpot ? Number(goldSpot.price).toLocaleString() : '—' }}
@@ -246,7 +309,7 @@ onMounted(async () => {
             </div>
 
             <div class="spot-row">
-              <span class="spot-label">⚪ 은 <span class="text-xs">g당</span></span>
+              <span class="spot-label">⚪ 은 <span class="text-xs">/oz</span></span>
               <span class="spot-price">
                 <span>$</span>
                 {{ silverSpot ? Number(silverSpot.price).toLocaleString() : '—' }}
@@ -324,31 +387,25 @@ onMounted(async () => {
           </ol>
         </div>
 
-        <!-- 목표 달성 계산기 -->
-        <div class="panel calc-panel">
-          <div class="panel-head">
-            <div class="panel-title">💰 목표 달성 계산기</div>
-          </div>
-          <div class="calc-body">
-            <div class="calc-input-row">
-              <label>매달 <b>{{ (calcAmount / 10000).toLocaleString() }}만</b>원씩</label>
-              <input type="range" v-model.number="calcAmount" min="100000" max="2000000" step="100000">
-            </div>
-            <div class="calc-input-row">
-              <label><b>{{ calcMonths }}개월</b> 동안 모으면?</label>
-              <input type="range" v-model.number="calcMonths" min="6" max="36" step="6">
-            </div>
-            <div class="calc-result-box">
-              <span class="result-label">만기 예상 수령액(세전)</span>
-              <div class="result-value">약 <span>{{ expectedResult }}</span>원</div>
-            </div>
-          </div>
-        </div>
-
+        <!-- ✅ 기존 맨 아래 목표달성 계산기 패널은 이제 "요약 카드 영역"으로 이동했으므로 여기서는 삭제 -->
       </div>
     </section>
+
+    <!-- ✅ AI 플로팅 버튼 -->
+    <button
+      class="ai-fab"
+      type="button"
+      aria-label="AI 맞춤 추천 바로가기"
+      @click="router.push({ name: 'AIRecommendView' })"
+    >
+      🤖
+    </button>
+
+
+
   </main>
 </template>
+
 
 
 <style scoped>
@@ -357,17 +414,24 @@ onMounted(async () => {
   padding: 34px 18px 44px;
 }
 
+
+
+
+
 .hero {
   position: relative;
   max-width: 980px;
-  margin: 0 auto 22px;
-  padding: 30px 18px 18px;
+  margin: 0 auto 8px;        /* ✅ 더 줄임 */
+  padding: 20px 18px 6px;    /* ✅ 위/아래 패딩 더 줄임 */
   text-align: center;
-  min-height: 58vh;
+
+  min-height: 62vh;          /* ✅ 70 → 62로 확 줄여서 배너가 위로 붙음 */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 8px;                  /* ✅ 문구 덩어리 간격 살짝 줄임 */
 }
+
 
 /* 좌/우 일러스트 */
 .hero::before,
@@ -393,11 +457,27 @@ onMounted(async () => {
   background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20width%3D'420'%20height%3D'260'%20viewBox%3D'0%200%20420%20260'%3E%0A%20%20%3Cpath%20d%3D'M120%2085%20L210%2035%20L300%2085%20Z'%20fill%3D'rgb(232%2C236%2C246)'%20stroke%3D'rgb(206%2C214%2C230)'%20stroke-width%3D'6'%20stroke-linejoin%3D'round'/%3E%0A%20%20%3Crect%20x%3D'120'%20y%3D'85'%20width%3D'180'%20height%3D'120'%20rx%3D'18'%20fill%3D'rgb(252%2C253%2C255)'%20stroke%3D'rgb(206%2C214%2C230)'%20stroke-width%3D'6'/%3E%0A%20%20%3Ccircle%20cx%3D'325'%20cy%3D'165'%20r%3D'28'%20fill%3D'rgb(255%2C210%2C110)'%20stroke%3D'rgb(237%2C176%2C70)'%20stroke-width%3D'8'/%3E%0A%20%20%3Ccircle%20cx%3D'360'%20cy%3D'185'%20r%3D'22'%20fill%3D'rgb(255%2C210%2C110)'%20stroke%3D'rgb(237%2C176%2C70)'%20stroke-width%3D'7'/%3E%0A%20%20%3Cpath%20d%3D'M334%2078%20l8%2016%20l16%208%20l-16%208%20l-8%2016%20l-8-16%20l-16-8%20l16-8z'%20fill%3D'rgb(132%2C202%2C255)'%20opacity%3D'0.9'/%3E%0A%3C/svg%3E");
 }
 
+
+
 .welcome {
-  margin: 0 0 10px;
+  margin: 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  /* ✅ 흰색 배경(알약) 제거 */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+
   font-size: 0.95rem;
   color: rgba(49, 34, 20, 0.75);
+  opacity: 0.9;
+
 }
+
+
 
 .title {
   margin: 0;
@@ -421,36 +501,47 @@ onMounted(async () => {
 }
 
 .subtitle {
-  margin: 10px 0 0;
+  margin: 0; /* ✅ 기존 10px 상단 여백 제거하고 hero gap으로 통일 */
   font-size: 0.95rem;
   color: rgba(49, 34, 20, 0.62);
 }
+
 
 .subtitle b {
   color: rgba(34, 58, 94, 0.9);
 }
 
 .banner-grid {
+  width: 100%;
   max-width: 980px;
-  margin: 0 auto;
+  margin: 6px auto 0;       /* ✅ 18 → 10 : 배너를 위로 당김 */
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 12px;
+  margin-top: 0px !important;     /* ✅ 위쪽 여백 제거 */
+  transform: translateY(-40px);                  /* ✅ 14 → 12 : 살짝 더 촘촘하게 */
 }
 
+
+
 .banner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 54px 1fr; /* ✅ 아이콘 칸 살짝 줄여서 텍스트 당김 */
   align-items: center;
-  gap: 14px;
-  padding: 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.72);
+  column-gap: 12px;
+
+  padding: 14px 16px;        /* ✅ 18px → 14/16 : 내부 여백 줄여 균형 */
+  border-radius: 20px;
+
   border: 1px solid rgba(49, 34, 20, 0.10);
   box-shadow: 0 10px 26px rgba(49, 34, 20, 0.10);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  min-height: 76px;          /* ✅ 카드 높이를 통일해서 들쭉날쭉 방지 */
 }
+
+
 
 .banner:hover {
   transform: translateY(-5px);
@@ -459,32 +550,48 @@ onMounted(async () => {
 }
 
 .icon-box {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
+  width: 46px;               /* ✅ 52 → 46 : 너무 커서 어색한 느낌 줄임 */
+  height: 46px;
+  border-radius: 14px;
+
   display: grid;
   place-items: center;
-  font-size: 1.55rem;
-  background: var(--accent-soft);
+  font-size: 1.35rem;        /* ✅ 살짝 줄여서 통일감 */
+
+  justify-self: start;
+
+  background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(49, 34, 20, 0.10);
 }
+
+
+/* .banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+} */
 
 .banner-text {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  text-align: left;        /* ✅ 모두 왼쪽 정렬 */
+  justify-self: start;
 }
 
 .banner-title {
-  font-weight: 900;
+  font-weight: 950;
   letter-spacing: -0.2px;
   color: rgba(49, 34, 20, 0.92);
+  line-height: 1.15;       /* ✅ 줄간격 통일 */
 }
 
 .banner-desc {
   font-size: 0.88rem;
   color: rgba(49, 34, 20, 0.58);
+  line-height: 1.15;       /* ✅ AI 배너만 달라 보이던 문제 해결 */
 }
+
 
 .banner--deposit {
   --accent-soft: rgba(255, 197, 120, 0.62);
@@ -511,11 +618,18 @@ onMounted(async () => {
 }
 
 /* 하단 대시보드 */
-.bottom {
+/* .bottom {
   max-width: 980px;
   margin: 22px auto 0;
   padding-top: 8px;
+} */
+
+.bottom {
+  max-width: 980px;
+  margin: 0 auto 0; /* ✅ hero가 화면 대부분 먹도록 아래 여백 제거 */
+  padding-top: 48px; /* ✅ 스크롤 내려야 카드가 등장하는 느낌 */
 }
+
 
 .summary-grid {
   display: grid;
@@ -921,6 +1035,7 @@ onMounted(async () => {
   padding: 0 10px;
   animation: fadeInDown 0.8s ease-out;
   /* 부드럽게 나타나는 효과 */
+  margin-top: 22px;
 }
 
 .tip-content {
@@ -992,6 +1107,173 @@ onMounted(async () => {
 .fade-up-enter-to {
   opacity: 1;
   transform: translateY(0);
+}
+
+
+/* ✅ AI 플로팅 버튼(FAB) */
+/* .ai-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 1.35rem;
+  font-weight: 900;
+
+  border: 1px solid rgba(34, 58, 94, 0.18);
+  background: rgba(168, 214, 255, 0.70);
+  color: rgba(34, 58, 94, 0.95);
+
+  box-shadow: 0 14px 30px rgba(49, 34, 20, 0.16);
+  cursor: pointer;
+  z-index: 9999;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+} */
+
+
+.ai-fab {
+  position: fixed;
+  right: 28px;   /* ✅ 더 안쪽 */
+  bottom: 88px;  /* ✅ 더 위쪽 */
+
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 1.35rem;
+  font-weight: 900;
+
+  border: 1px solid rgba(34, 58, 94, 0.18);
+  background: rgba(168, 214, 255, 0.70);
+  color: rgba(34, 58, 94, 0.95);
+
+  box-shadow: 0 14px 30px rgba(49, 34, 20, 0.16);
+  cursor: pointer;
+  z-index: 9999;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+
+.ai-fab:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 36px rgba(49, 34, 20, 0.20);
+}
+
+.ai-fab:active {
+  transform: translateY(-1px);
+}
+
+/* ✅ 첫 화면 하단 6개 배너 그리드 */
+.banner-grid {
+  width: 100%;
+  max-width: 980px;
+  margin: 26px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 18px;
+  border-radius: 20px;
+
+  border: 1px solid rgba(49, 34, 20, 0.10);
+  box-shadow: 0 10px 26px rgba(49, 34, 20, 0.10);
+
+  text-decoration: none;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.banner:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(49, 34, 20, 0.14);
+}
+
+.icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 1.55rem;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(49, 34, 20, 0.10);
+}
+
+.banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.banner-title {
+  font-weight: 950;
+  letter-spacing: -0.2px;
+  color: rgba(49, 34, 20, 0.92);
+}
+
+.banner-desc {
+  font-size: 0.88rem;
+  color: rgba(49, 34, 20, 0.58);
+}
+
+/* ✅ 배너 개별 색상 (너가 준 값 그대로) */
+.b-orange { background-color: #ffcc95; }
+.b-yellow { background-color: #ffecb3; }
+.b-blue   { background-color: #d1e9ff; }
+.b-peach  { background-color: #ffd8c4; }
+.b-sky    { background-color: #d6ebff; }
+.b-purple { background-color: #f3e5f5; }
+
+/* ✅ 반응형 */
+@media (max-width: 820px) {
+  .banner-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+/* ✅ 배너 정렬 강제 (hero의 text-align:center 상속 문제 해결) */
+.banner {
+  display: grid !important;              /* flex로 덮여도 grid로 고정 */
+  grid-template-columns: 56px 1fr;       /* 아이콘/텍스트 시작선 통일 */
+  column-gap: 12px;
+  align-items: center;
+  justify-items: start;
+  text-align: left !important;           /* ✅ 핵심: 텍스트 좌측 정렬 강제 */
+}
+
+.icon-box {
+  justify-self: start;                   /* 아이콘 박스를 왼쪽에 고정 */
+}
+
+.banner-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;               /* ✅ 텍스트 덩어리 왼쪽 정렬 */
+  text-align: left !important;
+}
+
+.banner-title,
+.banner-desc {
+  text-align: left !important;           /* ✅ AI 포함 전부 동일한 시작선 */
 }
 
 </style>
