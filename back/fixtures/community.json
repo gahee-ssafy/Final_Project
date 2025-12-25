@@ -1,7 +1,0 @@
-[
-{
-  "model": "community.post",
-  "pk": 1,
-  "fields": {
-    "author": 1,
-    "title": 

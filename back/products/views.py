@@ -170,16 +170,14 @@ def cosine_similarity(v1, v2):
 @api_view(['POST'])
 def recommend(request):
     # 1. 프론트엔드에서 보낸 사용자 입력 받기
-    # 하드코딩
     user_input = request.data.get('message')
     
     # 2. 사용자 입력 임베딩 (GMS API)
-    GMS_API_KEY="S14P02EB04-212fb62d-0aaf-410d-a2ab-27f5f8993de2"
+    GMS_API_KEY=""
     
     url = "https://gms.ssafy.io/gmsapi/api.openai.com/v1/embeddings"
     headers = {"Authorization": f"Bearer {GMS_API_KEY}", "Content-Type": "application/json"}
     payload = {"model": "text-embedding-3-large", "input": user_input}
-    
     response = requests.post(url, headers=headers, json=payload)
     user_vector = response.json()['data'][0]['embedding']
 
@@ -189,7 +187,7 @@ def recommend(request):
     
     for p in products:
         score = cosine_similarity(user_vector, p.embedding_vector)
-        # ✅ [수정 포인트] 'depositoptions_set' 대신 설정한 'related_name'을 쓰세요! -> options
+        
         try:
             max_rate = p.options.aggregate(Max('intr_rate2'))['intr_rate2__max']
         except AttributeError:
