@@ -1,15 +1,17 @@
 from django.contrib import admin
 from django.urls import path, include
-from accounts.views import CustomRegisterView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # products 앱의 URL을 /api/v1/products/ 로 시작하게 연결
+
+    # products
     path('api/v1/products/', include('products.urls')),
-    # 로그인/회원가입
-    path('accounts/', include('dj_rest_auth.urls')),                # 로그인, 로그아웃
-    path('accounts/signup/', CustomRegisterView.as_view(), name='rest_register'),
+
+    # ✅ accounts (로그인/로그아웃/회원가입/me 등 전부 accounts/urls.py에서 관리)
     path('accounts/', include('accounts.urls')),
-     # ✅ community
+
+    # community
     path('api/v1/community/', include('community.urls')),
+
+
 ]

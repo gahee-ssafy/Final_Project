@@ -1,15 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 
-// [중요] 우리가 만든 파일들을 import(수입) 해옵니다.
 import DepositView from '@/views/DepositView.vue'
+import DepositDetailView from '@/views/DepositDetailView.vue'
 import GoldView from '@/views/GoldView.vue'
 
-// ✅ 로그인/회원가입 뷰 추가
 import LogInView from '@/views/LogInView.vue'
 import SignUpView from '@/views/SignUpView.vue'
 
 import MapView from '@/views/MapView.vue'
+
+// ✅ F08 마이페이지(새로 생성할 뷰)
+import ProfileView from '@/views/ProfileView.vue'
 
 // F05 유튜브 
 import YoutubeSearchView from '@/views/youtube/YoutubeSearchView.vue'
@@ -22,18 +24,23 @@ import CommunityDetailView from '@/views/community/CommunityDetailView.vue'
 import CommunityCreateView from '@/views/community/CommunityCreateView.vue'
 import CommunityEditView from '@/views/community/CommunityEditView.vue'
 
+// ✅ auth store (가드용)
+import { useAuthStore } from '@/stores/auth'
+
+
+import AIRecommendView from '@/views/AIRecommendView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // 1. 메인 페이지
     {
       path: '/',
       name: 'home',
       component: HomeView,
     },
 
-    // ✅ 로그인 / 회원가입 페이지
+    // ✅ 로그인 / 회원가입
     {
       path: '/login',
       name: 'LogInView',
@@ -45,27 +52,36 @@ const router = createRouter({
       component: SignUpView,
     },
 
-    // 2. 예적금 조회 페이지 (버튼: DepositView)
+    // ✅ F08 마이페이지 (로그인 필요)
+    {
+      path: '/profile',
+      name: 'ProfileView',
+      component: ProfileView,
+      meta: { requiresAuth: true },
+    },
+
+    // 예적금
     {
       path: '/deposit',
-      name: 'DepositView', // HomeView의 :to="{ name: 'DepositView' }" 와 일치해야 함
+      name: 'DepositView',
       component: DepositView,
     },
 
-    // 3. 금/은 시세 페이지 (버튼: GoldView)
+    // 금/은
     {
       path: '/gold',
-      name: 'GoldView', // HomeView의 :to="{ name: 'GoldView' }" 와 일치해야 함
+      name: 'GoldView',
       component: GoldView,
     },
 
-    // 4. 지도 페이지
+    // 지도
     {
       path: '/map',
       name: 'MapView',
       component: MapView
     },
-    // 5. 유튜브
+
+    // 유튜브
     {
       path: '/youtube',
       name: 'YoutubeSearchView',
@@ -81,7 +97,8 @@ const router = createRouter({
       name: 'YoutubeVideoDetailView',
       component: YoutubeVideoDetailView,
     },
-    // 7. 커뮤니티
+
+    // 커뮤니티
     {
       path: '/community',
       name: 'CommunityListView',
@@ -102,8 +119,31 @@ const router = createRouter({
       name: 'CommunityEditView',
       component: CommunityEditView,
     },
-
+    // 8. AI 상품 추천 페이지 (새로 추가!)
+    {
+      path: '/recommend',
+      name: 'AIRecommendView',
+      component: AIRecommendView,
+    },
+    
+    // 목록상세조회
+    {
+      path: '/deposit/:fin_prdt_cd',
+      name: 'DepositDetailView',
+      component: DepositDetailView,
+    },
   ],
+})
+
+/**
+ * ✅ 로그인 가드
+ * meta.requiresAuth === true 인 라우트는 로그인 안했으면 /login으로 이동
+ */
+router.beforeEach((to) => {
+  const auth = useAuthStore()
+  if (to.meta?.requiresAuth && !auth.isLogin) {
+    return { name: 'LogInView' }
+  }
 })
 
 export default router
